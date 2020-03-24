@@ -21,16 +21,6 @@ def tree(x_t, y_t, age):
     circle(x_t, y_t - age * 6.5, age * 1.5)
     circle(x_t - age * 1.5, y_t - age * 5, age * 1.5)
     circle(x_t + age * 1.5, y_t - age * 5, age * 1.5)
-def cloud(x_c, y_c, radius):
-    penColor("black")
-    brushColor("white") 
-    circle(x_c, y_c, radius)
-    circle(x_c + radius, y_c, radius)
-    circle(x_c + radius * 2, y_c, radius)
-    circle(x_c + radius * 3, y_c, radius)
-    circle(x_c + radius * 2, y_c - radius * 0.8, radius)
-    circle(x_c + radius, y_c - radius * 0.8, radius)
-    return circle(x_c, y_c, radius), circle(x_c + radius, y_c, radius), circle(x_c + radius * 2, y_c, radius), circle(x_c + radius * 3, y_c, radius), circle(x_c + radius * 2, y_c - radius * 0.8, radius), circle(x_c + radius, y_c - radius * 0.8, radius)
 def house(x_h, y_h, width, height):
     penColor("black")
     brushColor("darkgoldenrod")
@@ -41,27 +31,37 @@ def house(x_h, y_h, width, height):
     penColor("black")
     brushColor("brown")
     polygon([(x_h - width/2, y_h - height), (x_h, y_h - height * 1.7), (x_h + width / 2, y_h - height), (x_h - width/2, y_h - height)])
+def cloud(x_c, y_c, radius):
+    penColor("black")
+    brushColor("white") 
+    return circle(x_c, y_c, radius), circle(x_c + radius, y_c, radius), circle(x_c + radius * 2, y_c, radius), circle(x_c + radius * 3, y_c, radius), circle(x_c + radius * 2, y_c - radius * 0.8, radius), circle(x_c + radius, y_c - radius * 0.8, radius)
 def motion_of_clouds():
     for i in range(quantity):
         for j in range(6):
-            moveObjectBy(clouds[i][j], 1, 0)
-            if xCoord(clouds[i][j]) > x_of_window:
-                pass
+            moveObjectBy(clouds[i][j], 5, 0)
+            if xCoord(clouds[i][1]) > x_of_window + 18:
+                clouds[i] = (cloud(-3 * radiusis[i], random.randrange(20, 130), radiusis[i]))
+                house(110, 220, 110, 80)
+                tree(200, 210, 10)
+                house(300, 200, 70, 50)
+                tree(360, 190, 7)
 x_of_window = 455
 y_of_window = 300
 windowSize(x_of_window, y_of_window)
 canvasSize(x_of_window, y_of_window)
 penColor("lightskyblue")
 brushColor("lightskyblue")
-rectangle(0, 0, 455, 150)
+rectangle(0, 0, x_of_window, y_of_window / 2)
 penColor("forestgreen")
 brushColor("forestgreen")
-rectangle(0, 150, 455, 300)
+rectangle(0, y_of_window / 2, x_of_window, y_of_window)
 sun(50, 50, 40, 20, 0.3)
 quantity = 7
+radiusis = []
 clouds = []
-for k in range(quantity):
-    clouds.append(cloud(-x_of_window * (k + 1) / quantity, random.randrange(20, 100), random.randrange(10, 18)))
+for i in range(quantity):
+    radiusis.append(random.randrange(10, 18))
+    clouds.append(cloud(-x_of_window * (i + 1) / quantity, random.randrange(20, 130), radiusis[i]))
 house(110, 220, 110, 80)
 tree(200, 210, 10)
 house(300, 200, 70, 50)
