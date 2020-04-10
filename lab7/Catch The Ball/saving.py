@@ -2,6 +2,7 @@ import scores
 
 
 def saver(result, name):
+    '''Функция, сохраняющая результат в рекорды, т.е. data'''
     f = open("data.txt", mode='r', encoding='utf-8')
     fiction = f.readline()[0:-1]
     if result < int(fiction):

@@ -8,19 +8,27 @@ WIDTH = 400
 
 
 class Ball:
+    '''Класс мячик:
+       Мячики без учета гравитации отталкиваются от стен
+       При нажатии на них результат увеличивается'''
     def __init__(self):
+        '''Инициализация:
+           color -- цвет мячика
+           r -- радиус
+           (x, y) -- координаты центра мячика
+           (dx, dy) -- смещение по осям за одну отрисовку
+           ball_id -- присвоение имени ball_id к мячику'''
         ball_colors = ['Blue', 'MediumBlue', 'DarkBlue', 'Navy', 'MidnightBlue']
         self.color = choice(ball_colors)
         self.r = rnd(15, 30)
-        self.x = rnd(self.r, WIDTH - self.r)
-        self.y = rnd(self.r, HEIGHT - self.r)
-        self.dx = rnd(-10, 10)
-        self.dy = rnd(-10, 10)
+        self.x, self.y = rnd(self.r, WIDTH - self.r),  rnd(self.r, HEIGHT - self.r)
+        self.dx, self.dy = rnd(-10, 10), rnd(-10, 10)
         self.ball_id = canvas.create_oval(self.x-self.r, self.y-self.r,
                                           self.x+self.r, self.y+self.r,
                                           fill=self.color, width=0)
 
     def move(self):
+        '''Изменение координат и проверка нахождения мячика внутри холста'''
         self.x += self.dx
         self.y += self.dy
         if not self.r <= self.x <= WIDTH - self.r:
@@ -29,10 +37,14 @@ class Ball:
             self.dy = -self.dy
             
     def show(self):
+        '''Отображение и перемещение мячика на dx и dy'''
         canvas.move(self.ball_id, self.dx, self.dy)
 
 
 def ball_tick():
+    '''Тикер:
+       Двигает и отображаает мячики с помощью соответствующих функций
+       Если таймер истек(end=1), то запускается scores.main'''
     global root_copy, end
     for ball in balls:
         ball.move()
@@ -45,27 +57,38 @@ def ball_tick():
 
 
 class Square:
+    '''Класс квадрат:
+       Квадраты появляются снизу и вылетают вверх, затем они падают с учетом гравитации
+       При нажатии на них результат уменьшается'''
     def __init__(self):
+        '''Инициализация:
+                   color -- цвет квадрата
+                   a -- сторона
+                   (x, y) -- координаты левой верхней вершины квадрата
+                   (dx, dy) -- смещение по осям за одну отрисовку
+                   square_id -- присвоение имени square_id к квадрату'''
         square_colors = ['Crimson', 'Red', 'FireBrick', 'DarkRed', 'Maroon']
         self.color = choice(square_colors)
         self.a = rnd(40, 60)
-        self.x = rnd(0, WIDTH - self.a)
-        self.y = HEIGHT 
-        self.dx = rnd(-5, 5)
-        self.dy = rnd(-30, -20)
+        self.x, self.y = rnd(0, WIDTH - self.a), HEIGHT
+        self.dx, self.dy = rnd(-5, 5), rnd(-30, -20)
         self.square_id = canvas.create_rectangle(self.x, self.y, self.x+self.a, self.y+self.a,
                                                  fill=self.color, width=0)
 
     def move(self):
+        '''Изменение координат и увеличение скорости вниз (гравитация)'''
         self.x += self.dx
         self.dy += 1
         self.y += self.dy
         
     def show(self):
+        '''Отображение и перемещение квадрата на dx и dy'''
         canvas.move(self.square_id, self.dx, self.dy)
 
 
 def square_tick():
+    '''Тикер:
+           Двигает и отображаает квадраты с помощью соответствующих функций'''
     global root_copy, end
     i = 0
     for square in squares:
@@ -77,24 +100,13 @@ def square_tick():
         i += 1
     if not end:
         root_copy.after(50, square_tick)
-    else:
-        canvas.delete(tk.ALL)
-        scores.main(root_copy, result)
 
 
 def click(event):
-    def square_click(event):
-        global canvas, squares, result
-        i = 0
-        for square in squares:
-            if 0 < event.x - square.x < square.a and 0 < event.y - square.y < square.a:
-                canvas.delete(square.square_id)
-                new_square = Square()
-                squares[i] = new_square
-                result -= 2
-            i += 1
+    '''Описание и вызов в случае event функций-обработчиков кликов'''
 
     def ball_click(event):
+        '''Обработчик кликов по мячикам'''
         global canvas, balls, result
         i = 0
         for ball in balls:
@@ -105,11 +117,24 @@ def click(event):
                 result += 2
             i += 1
 
-    square_click(event)
+    def square_click(event):
+        '''Обработчик кликов по квадратам'''
+        global canvas, squares, result
+        i = 0
+        for square in squares:
+            if 0 < event.x - square.x < square.a and 0 < event.y - square.y < square.a:
+                canvas.delete(square.square_id)
+                new_square = Square()
+                squares[i] = new_square
+                result -= 2
+            i += 1
+
     ball_click(event)
+    square_click(event)
 
 
 def timer():
+    '''Отсчитывает 0:9:99, затем end=1, что значит завершение всех тикеров и запуск scores.main'''
     global canvas, time_seconds, time_milliseconds, result, root_copy, end
     if time_milliseconds < 99:
         time_milliseconds += 1
@@ -125,6 +150,7 @@ def timer():
     
 
 def main(root):
+    '''Определение переменных и вызов функций'''
     global canvas, balls, squares, result, time_seconds, time_milliseconds,  root_copy, end
     end = 0
     result = 0

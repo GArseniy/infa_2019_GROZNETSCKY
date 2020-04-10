@@ -7,19 +7,9 @@ HEIGHT = 400
 WIDTH = 400
 
 
-def button1(event):
-    global root_copy, name, result_copy
-    name = name.get()
-    saver(result_copy, name)
-    Ctb.main(root_copy)
-
-
-def button2(event):
-    global root_copy
-    Ctb.main(root_copy)
-
-
 def time_is_up():
+    '''1. Надпись "Время вышло"
+       2. По истечении 200 единиц времени переключение на меню'''
     global root_copy
     fra0 = tk.Frame(root_copy, bg="PowderBlue", bd=5)
     fra0.grid(row=0, column=0)
@@ -29,6 +19,7 @@ def time_is_up():
     fra.grid(row=1, column=0)
     
     def timer():
+        '''Отсчитывает 200 единиц времени и сменяет надпись "Время вышло" на одно из меню в зависимости от результата "'''
         global time_milliseconds, result_copy
         end = 0
         if time_milliseconds < 200:
@@ -47,6 +38,14 @@ def time_is_up():
 
 
 def saving_menu(root):
+    '''Меню сохранения рекорда:
+       Включает в себя строку для ввода своего имени, рекорды и кнопку выхода в меню'''
+    def button1(event):
+        '''Обработчик нажатия на кнопку but1'''
+        global root_copy, name, result_copy
+        name = name.get()
+        saver(result_copy, name)
+        Ctb.main(root_copy)
     global name
     canvas = tk.Canvas(root, bg="PowderBlue", height=HEIGHT, width=WIDTH)
     canvas.grid(row=0, column=0)
@@ -72,7 +71,12 @@ def saving_menu(root):
 
 
 def not_saving_menu(root, result_copy):
-    
+    '''Меню проигрыша:
+       Показывает рекорды и предлагает перейти в главное меню'''
+    def button2(event):
+        '''Обработчик нажатия на кнопку but2'''
+        global root_copy
+        Ctb.main(root_copy)
     canvas = tk.Canvas(root, bg="PowderBlue", height=HEIGHT, width=WIDTH)
     canvas.grid(row=0, column=0)
     
@@ -104,6 +108,7 @@ def not_saving_menu(root, result_copy):
 
     
 def main(root, result):
+    '''Вызов необходимых функций'''
     global root_copy, result_copy, time_milliseconds
     root_copy = root
     result_copy = result
