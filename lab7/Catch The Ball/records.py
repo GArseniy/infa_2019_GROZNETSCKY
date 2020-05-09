@@ -13,7 +13,7 @@ def button1(event):
 
 
 def init_and_show():
-    '''Описание инициализации и отображения виждетов на холсте '''
+    '''Описание инициализации и отображения виждетов на холсте'''
     global root_copy, canvas
 #   '''Инициализация'''
     canvas = tk.Canvas(root_copy, bg="PowderBlue", height=HEIGHT, width=WIDTH)

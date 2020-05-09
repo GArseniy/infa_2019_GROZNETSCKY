@@ -157,10 +157,8 @@ def main(root):
     time_seconds = 0
     time_milliseconds = 0
     root_copy = root
-
     canvas = tk.Canvas(root, bg="PowderBlue", height=HEIGHT + 35, width=WIDTH)
     canvas.grid(row=0, column=0)
-
     n = 10
     balls = [Ball() for i in range(n)]
     ball_tick()
