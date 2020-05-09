@@ -29,15 +29,24 @@ class Cannon:
                                                (self.x3, self.y3), (self.x4, self.y4), fill=self.color)
 
     def increasing_the_length_and_color_gradation_of_the_cannon(self):
-        global button_released, root_copy
+        global button_released, root_copy, red
+        def from_rgb(rgb):
+            """Переводит RGB"""
+            return "#%02x%02x%02x" % rgb
         if not button_released:
-            if self.length < 150:
+            if self.length < 126:
                 self.length += 1
+                self.color = from_rgb((red, 0, 0))
+                red += 5
             else:
                 self.length = 75
-            root_copy.after(10, self.increasing_the_length_and_color_gradation_of_the_cannon)
+                red = 0
+                self.color = 'black'
+            root_copy.after(20, self.increasing_the_length_and_color_gradation_of_the_cannon)
         else:
             self.length = 75
+            red = 0
+            self.color = 'black'
 
 
 class Cannonball:
@@ -112,7 +121,8 @@ def button_released_handler(event):
     button_released = 1
 
 def main(root):
-    global cannon, canvas, root_copy
+    global cannon, canvas, root_copy, red
+    red = 0
     root_copy = root
     canvas = tk.Canvas(root, height=HEIGHT, width=WIDTH)
     canvas.grid(row=0, column=0)
