@@ -7,13 +7,20 @@ WIDTH = 1200
 
 
 class Cannon:
-    '''Пушка:    вращается вокруг точки - середины ширины пушки;
-                 атрибуты:    длина
-                              ширина
-                              цвет
-                              координаты
-                              синус и косинус угла между горизонтом и линией пушки'''
+    '''Пушка:    вращается вокруг точки - середины ширины пушки(хотелось бы, но нет);
+                 атрибуты:    id,
+                              длина,
+                              ширина,
+                              цвет,
+                              координаты,
+                              синус и косинус угла между горизонтом и линией пушки.'''
     def __init__(self):
+        '''Инициализация пушки:
+           id,
+           длина,
+           ширина,
+           цвет,
+           координаты расчитываются по формулам - получается прямоугольник.'''
         global canvas
         self.length = 75
         self.width = 15
@@ -29,9 +36,12 @@ class Cannon:
                                                (self.x3, self.y3), (self.x4, self.y4), fill=self.color)
 
     def increasing_the_length_and_color_gradation_of_the_cannon(self):
+        '''По нажатию левой кнопки мыши: плавное изменение цвета с черного на красный,
+                                         увеличение длины пушки.
+           По ее отпусканию возвращаются изначальные показатели'''
         global button_released, root_copy, red
         def from_rgb(rgb):
-            """Переводит RGB"""
+            """Конвертирует RGB."""
             return "#%02x%02x%02x" % rgb
         if not button_released:
             if self.length < 126:
@@ -76,6 +86,8 @@ def checking_the_destruction_of_targets():
 
 
 def cannon_tick():
+    '''Тикер пушки:
+                   по таймеру происходит расчет координат и отрисовка.'''
     global canvas, cannon, root_copy
     sine = cannon.sine_of_angle_between_the_horizon_line_and_the_cannon_line
     cosine = cannon.cosine_of_angle_between_the_horizon_line_and_the_cannon_line
@@ -101,12 +113,14 @@ def target_tick():
 
 
 def click_handler(event):
+    '''Нажатие левой кнопкой мыши на холст.'''
     global cannon, button_released
     button_released = 0
     cannon.increasing_the_length_and_color_gradation_of_the_cannon()
 
 
 def motion_of_mouse_handler(event):
+    '''Движение курсора по холсту.'''
     global cannon, canvas
     cannon.sine_of_angle_between_the_horizon_line_and_the_cannon_line = (cannon.x1 - event.x) / \
                                                                                (((event.x - cannon.x1)**2 +
@@ -117,10 +131,12 @@ def motion_of_mouse_handler(event):
 
 
 def button_released_handler(event):
+    '''Отпускание левой кнопки мыши.'''
     global button_released
     button_released = 1
 
 def main(root):
+    '''Инициализация холста, bindов; отображение холста.'''
     global cannon, canvas, root_copy, red
     red = 0
     root_copy = root
