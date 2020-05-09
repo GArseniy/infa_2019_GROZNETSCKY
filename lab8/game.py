@@ -17,7 +17,7 @@ class Cannon:
         global canvas
         self.length = 75
         self.width = 15
-        self.color = 'red'
+        self.color = 'black'
         sine = self.sine_of_angle_between_the_horizon_line_and_the_cannon_line = 1
         cosine = self.cosine_of_angle_between_the_horizon_line_and_the_cannon_line = 0
 
@@ -28,14 +28,16 @@ class Cannon:
         self.cannon_id = canvas.create_polygon((self.x1, self.y1), (self.x2, self.y2),
                                                (self.x3, self.y3), (self.x4, self.y4), fill=self.color)
 
-    def increasing_the_length_and_color_gradation_of_the_cannon_by_timer(self):
-        pass
-
-    def rotation_of_the_cannon(self):
-        global canvas
-        canvas.delete(self.cannon_id)
-        self.cannon_id = canvas.create_polygon((self.x1, self.y1), (self.x2, self.y2), (self.x3, self.y3),
-                                               (self.x4, self.y4), fill=self.color)
+    def increasing_the_length_and_color_gradation_of_the_cannon(self):
+        global button_released, root_copy
+        if not button_released:
+            if self.length < 150:
+                self.length += 1
+            else:
+                self.length = 75
+            root_copy.after(10, self.increasing_the_length_and_color_gradation_of_the_cannon)
+        else:
+            self.length = 75
 
 
 class Cannonball:
@@ -64,6 +66,23 @@ def checking_the_destruction_of_targets():
     pass
 
 
+def cannon_tick():
+    global canvas, cannon, root_copy
+    sine = cannon.sine_of_angle_between_the_horizon_line_and_the_cannon_line
+    cosine = cannon.cosine_of_angle_between_the_horizon_line_and_the_cannon_line
+
+    cannon.x1, cannon.y1 = 100, HEIGHT - 100
+    cannon.x2, cannon.y2 = cannon.x1 - sine * cannon.length, cannon.y1 - cosine * cannon.length
+    cannon.x3, cannon.y3 = cannon.x2 + cosine * cannon.width, cannon.y2 - sine * cannon.width
+    cannon.x4, cannon.y4 = cannon.x1 + cosine * cannon.width, cannon.y1 - sine * cannon.width
+
+    canvas.delete(cannon.cannon_id)
+    cannon.cannon_id = canvas.create_polygon((cannon.x1, cannon.y1), (cannon.x2, cannon.y2),
+                                             (cannon.x3, cannon.y3), (cannon.x4, cannon.y4),
+                                             fill=cannon.color)
+    root_copy.after(30, cannon_tick)
+
+
 def cannonball_tick():
     pass
 
@@ -72,34 +91,37 @@ def target_tick():
     pass
 
 
-def click_and_motion_handler(event):
-    quit()
+def click_handler(event):
+    global cannon, button_released
+    button_released = 0
+    cannon.increasing_the_length_and_color_gradation_of_the_cannon()
 
 
-def moving_of_mouse_handler(event):
+def motion_of_mouse_handler(event):
     global cannon, canvas
-    sine = cannon.sine_of_angle_between_the_horizon_line_and_the_cannon_line = (cannon.x1 - event.x) / \
+    cannon.sine_of_angle_between_the_horizon_line_and_the_cannon_line = (cannon.x1 - event.x) / \
                                                                                (((event.x - cannon.x1)**2 +
                                                                                  (event.y - cannon.y1)**2) ** 0.5)
-    cosine = cannon.cosine_of_angle_between_the_horizon_line_and_the_cannon_line = (cannon.y1 - event.y)\
+    cannon.cosine_of_angle_between_the_horizon_line_and_the_cannon_line = (cannon.y1 - event.y)\
         / (((event.x - cannon.x1) ** 2
            + (event.y - cannon.y1) ** 2) ** 0.5)
-    cannon.x1, cannon.y1 = 100, HEIGHT - 100
-    cannon.x2, cannon.y2 = cannon.x1 - sine * cannon.length, cannon.y1 - cosine * cannon.length
-    cannon.x3, cannon.y3 = cannon.x2 + cosine * cannon.width, cannon.y2 - sine * cannon.width
-    cannon.x4, cannon.y4 = cannon.x1 + cosine * cannon.width, cannon.y1 - sine * cannon.width
-    cannon.rotation_of_the_cannon()
 
+
+def button_released_handler(event):
+    global button_released
+    button_released = 1
 
 def main(root):
-    global cannon, canvas
+    global cannon, canvas, root_copy
+    root_copy = root
     canvas = tk.Canvas(root, height=HEIGHT, width=WIDTH)
     canvas.grid(row=0, column=0)
     cannon = Cannon()
-    canvas.bind('<Motion>', moving_of_mouse_handler)
-    canvas.bind('<B1-Motion>', click_and_motion_handler)
-    root.mainloop()
     cannon_tick()
+    canvas.bind('<Motion>', motion_of_mouse_handler)
+    canvas.bind('<Button-1>', click_handler)
+    canvas.bind('<ButtonRelease-1>', button_released_handler)
+    root.mainloop()
 
 
 if __name__ == '__main__':
@@ -107,3 +129,4 @@ if __name__ == '__main__':
     root.geometry(str(WIDTH) + 'x' + str(HEIGHT) + '+80+50')
     root.title('The Game Cannon')
     main(root)
+    
