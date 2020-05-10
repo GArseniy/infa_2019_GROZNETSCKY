@@ -65,19 +65,22 @@ class Cannonball:
         sine = cannon.sine_of_angle_between_the_horizon_line_and_the_cannon_line
         cosine = cannon.cosine_of_angle_between_the_horizon_line_and_the_cannon_line
         self.x, self.y = cannon.x3 - cosine * cannon.width / 2, cannon.y3 + sine * cannon.width / 2
-        self.dx, self.dy = (cannon.x3 - cosine * cannon.width / 2 - 100) // 12, \
-                           (cannon.y3 + sine * cannon.width / 2 - HEIGHT + 100) // 12
-
+        self.dx, self.dy = (cannon.x3 - cosine * cannon.width / 2 - 100) / 5, \
+                           (cannon.y3 + sine * cannon.width / 2 - HEIGHT + 100) / 5
+        self.dy += 1
         self.cannonball_id = canvas.create_oval(self.x - self.r, self.y - self.r,
                                                 self.x + self.r, self.y + self.r, fill=self.color, width=0)
+        self.jump = 0
 
     def move(self):
         self.x += self.dx
         self.y += self.dy
+        self.dy += 1
         if not self.r <= self.x <= WIDTH - self.r:
             self.dx = -self.dx
         if not self.r <= self.y <= HEIGHT - self.r:
-            self.dy = -self.dy
+            self.dy = -0.8 * self.dy
+            self.jump += 1
 
     def show(self):
         global canvas
@@ -119,9 +122,14 @@ def cannon_tick():
 
 def cannonball_tick():
     global canvas, cannon, root_copy, cannonballs
+    i = 0
     for cannonball in cannonballs:
         cannonball.move()
         cannonball.show()
+        if cannonball.jump > 2:
+            canvas.delete(cannonball.cannonball_id)
+            cannonballs.pop(i)
+        i += 1
     root_copy.after(25, cannonball_tick)
 
 
