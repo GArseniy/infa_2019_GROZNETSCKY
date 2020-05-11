@@ -3,7 +3,7 @@ from random import randrange as rnd, choice
 
 
 HEIGHT = 600
-WIDTH = 1200
+WIDTH = 800
 
 
 class Cannon:
@@ -57,6 +57,24 @@ class Cannon:
             self.color = 'black'
 
 
+def cannon_tick():
+    '''Тикер пушки:
+                   по таймеру происходит расчет координат и отрисовка.'''
+    global canvas, cannon, root_copy
+    sine = cannon.sine_of_angle_between_the_horizon_line_and_the_cannon_line
+    cosine = cannon.cosine_of_angle_between_the_horizon_line_and_the_cannon_line
+    cannon.x1, cannon.y1 = 100 - cosine * cannon.width / 2, HEIGHT - 100 + sine * cannon.width / 2
+    cannon.x2, cannon.y2 = cannon.x1 + cosine * cannon.width, cannon.y1 - sine * cannon.width
+    cannon.x3, cannon.y3 = cannon.x2 - sine * cannon.length, cannon.y2 - cosine * cannon.length
+    cannon.x4, cannon.y4 = cannon.x1 - sine * cannon.length, cannon.y1 - cosine * cannon.length
+
+    canvas.delete(cannon.cannon_id)
+    cannon.cannon_id = canvas.create_polygon((cannon.x1, cannon.y1), (cannon.x2, cannon.y2),
+                                             (cannon.x3, cannon.y3), (cannon.x4, cannon.y4),
+                                             fill=cannon.color)
+    root_copy.after(25, cannon_tick)
+
+
 class Cannonball:
     def __init__(self):
         global cannon, canvas
@@ -87,39 +105,6 @@ class Cannonball:
         canvas.move(self.cannonball_id, self.dx, self.dy)
 
 
-class Target:
-    def __init__(self):
-        pass
-
-    def move(self):
-        pass
-
-    def show(self):
-        pass
-
-
-def checking_the_destruction_of_targets():
-    pass
-
-
-def cannon_tick():
-    '''Тикер пушки:
-                   по таймеру происходит расчет координат и отрисовка.'''
-    global canvas, cannon, root_copy
-    sine = cannon.sine_of_angle_between_the_horizon_line_and_the_cannon_line
-    cosine = cannon.cosine_of_angle_between_the_horizon_line_and_the_cannon_line
-    cannon.x1, cannon.y1 = 100 - cosine * cannon.width / 2, HEIGHT - 100 + sine * cannon.width / 2
-    cannon.x2, cannon.y2 = cannon.x1 + cosine * cannon.width, cannon.y1 - sine * cannon.width
-    cannon.x3, cannon.y3 = cannon.x2 - sine * cannon.length, cannon.y2 - cosine * cannon.length
-    cannon.x4, cannon.y4 = cannon.x1 - sine * cannon.length, cannon.y1 - cosine * cannon.length
-
-    canvas.delete(cannon.cannon_id)
-    cannon.cannon_id = canvas.create_polygon((cannon.x1, cannon.y1), (cannon.x2, cannon.y2),
-                                             (cannon.x3, cannon.y3), (cannon.x4, cannon.y4),
-                                             fill=cannon.color)
-    root_copy.after(25, cannon_tick)
-
-
 def cannonball_tick():
     global canvas, cannon, root_copy, cannonballs
     i = 0
@@ -133,8 +118,58 @@ def cannonball_tick():
     root_copy.after(25, cannonball_tick)
 
 
+class Target:
+    def __init__(self):
+        target_colors = ['Blue', 'MediumBlue', 'DarkBlue', 'Navy', 'MidnightBlue']
+        self.color = choice(target_colors)
+        self.r = rnd(15, 30)
+        self.x, self.y = rnd(self.r, WIDTH - self.r), rnd(self.r, HEIGHT - self.r)
+        self.dx, self.dy = rnd(-10, 10), rnd(-10, 10)
+        self.target_id = canvas.create_oval(self.x - self.r, self.y - self.r,
+                                          self.x + self.r, self.y + self.r,
+                                          fill=self.color, width=0)
+
+    def move(self):
+        self.x += self.dx
+        self.y += self.dy
+        if not self.r <= self.x <= WIDTH - self.r:
+            self.dx = -self.dx
+        if not self.r <= self.y <= HEIGHT - self.r:
+            self.dy = -self.dy
+
+    def show(self):
+        canvas.move(self.target_id, self.dx, self.dy)
+
+
+def target_making():
+    global targets
+    targets.append(Target())
+    root_copy.after(3000, target_making)
+
+
 def target_tick():
-    pass
+    global root_copy, targets
+    for target in targets:
+        target.move()
+        target.show()
+    root_copy.after(50, target_tick)
+
+
+def checking_the_destruction_of_targets():
+    global targets, cannonballs, root_copy, score, id_score
+    if targets and cannonballs:
+        i = 0
+        for target in targets:
+            for cannonball in cannonballs:
+                dx = cannonball.x - target.x
+                dy = cannonball.y - target.y
+                if (dx ** 2 + dy ** 2) ** 0.5 < cannonball.r + target.r:
+                    canvas.delete(target.target_id)
+                    targets.pop(i)
+                    score += 1
+                    canvas.itemconfig(id_score, text=score)
+            i += 1
+    root_copy.after(30, checking_the_destruction_of_targets)
 
 
 def click_handler(event):
@@ -163,15 +198,21 @@ def button_released_handler(event):
 
 def main(root):
     '''Инициализация холста, bindов; отображение холста.'''
-    global cannon, canvas, root_copy, red, cannonballs
+    global cannon, canvas, root_copy, red, cannonballs, targets, score, id_score
     cannonballs = []
+    targets = []
     red = 0
+    score = 0
     root_copy = root
     canvas = tk.Canvas(root, height=HEIGHT, width=WIDTH)
+    id_score = canvas.create_text(30, 30, text=score, font='Times, 28')
     canvas.grid(row=0, column=0)
     cannon = Cannon()
+    target_making()
     cannon_tick()
     cannonball_tick()
+    target_tick()
+    checking_the_destruction_of_targets()
     canvas.bind('<Motion>', motion_of_mouse_handler)
     canvas.bind('<Button-1>', click_handler)
     canvas.bind('<ButtonRelease-1>', button_released_handler)
