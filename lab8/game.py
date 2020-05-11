@@ -196,6 +196,21 @@ def button_released_handler(event):
     button_released = 1
 
 
+def new_game(event):
+    global cannon, canvas, root_copy, red, cannonballs, targets, score, id_score
+    if targets:
+        for target in targets:
+            canvas.delete(target.target_id)
+    if cannonballs:
+        for cannonball in cannonballs:
+            canvas.delete(cannonball.cannonball_id)
+    cannonballs = []
+    targets = []
+    red = 0
+    score = 0
+    canvas.itemconfig(id_score, text=score)
+
+
 def main(root):
     '''Инициализация холста, bindов; отображение холста.'''
     global cannon, canvas, root_copy, red, cannonballs, targets, score, id_score
@@ -216,11 +231,12 @@ def main(root):
     canvas.bind('<Motion>', motion_of_mouse_handler)
     canvas.bind('<Button-1>', click_handler)
     canvas.bind('<ButtonRelease-1>', button_released_handler)
+    canvas.bind('<Button-3>', new_game)
     root.mainloop()
 
 
 if __name__ == '__main__':
     root = tk.Tk()
     root.geometry(str(WIDTH) + 'x' + str(HEIGHT) + '+80+50')
-    root.title('The Game Cannon')
+    root.title('The Game Cannon. Для перезапуска игры: правая кнопка мыши.')
     main(root)
