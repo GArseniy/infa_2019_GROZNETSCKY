@@ -76,7 +76,22 @@ def cannon_tick():
 
 
 class Cannonball:
+    '''Пушечное ядро - круг:
+                            x, y - координаты центра
+                            r - радиус
+                            dx, dy - смещение по осям за одну отрисовку
+                            jump - количество отскоков от нижней границы окна,
+                                   после трех отскоков (jump = 3) ядро удаляется
+                            id - оно и в Африке id
+                            '''
     def __init__(self):
+        '''Инициализация:
+                            x, y - координаты центра
+                            r - радиус
+                            dx, dy - смещение по осям за одну отрисовку
+                            jump - количество отскоков от нижней границы окна,
+                                   после трех отскоков (jump = 3) ядро удаляется
+                            id - оно и в Африке id'''
         global cannon, canvas
         self.color = cannon.color
         self.r = 10
@@ -91,6 +106,7 @@ class Cannonball:
         self.jump = 0
 
     def move(self):
+        '''Проверка нахождения ядра в окне. И его измение координат.'''
         self.x += self.dx
         self.y += self.dy
         self.dy += 1
@@ -101,11 +117,16 @@ class Cannonball:
             self.jump += 1
 
     def show(self):
+        '''Перемещение ядра'''
         global canvas
         canvas.move(self.cannonball_id, self.dx, self.dy)
 
 
 def cannonball_tick():
+    '''Тикер:
+             Отрисовка ядер, хранящихся в списке cannonballs.
+             Если отскоков больше двух, то ядро удаляется.
+             '''
     global canvas, cannon, root_copy, cannonballs
     i = 0
     for cannonball in cannonballs:
@@ -119,7 +140,14 @@ def cannonball_tick():
 
 
 class Target:
+    '''Мишень - круг:
+                     x, y - координаты центра
+                     r - радиус
+                     dx, dy - смещение по осям за одну отрисовку
+                     color - цвет
+                     id'''
     def __init__(self):
+        '''Инициализация'''
         target_colors = ['Blue', 'MediumBlue', 'DarkBlue', 'Navy', 'MidnightBlue']
         self.color = choice(target_colors)
         self.r = rnd(15, 30)
@@ -130,6 +158,7 @@ class Target:
                                           fill=self.color, width=0)
 
     def move(self):
+        '''Проверка нахождения мишени в окне. И его измение координат.'''
         self.x += self.dx
         self.y += self.dy
         if not self.r <= self.x <= WIDTH - self.r:
@@ -138,16 +167,20 @@ class Target:
             self.dy = -self.dy
 
     def show(self):
+        '''Перемещение мишени'''
         canvas.move(self.target_id, self.dx, self.dy)
 
 
 def target_making():
+    '''Создание мишеней по таймеру'''
     global targets
     targets.append(Target())
     root_copy.after(3000, target_making)
 
 
 def target_tick():
+    '''Тикер:
+             отрисовка нового положения мишени по таймеру'''
     global root_copy, targets
     for target in targets:
         target.move()
@@ -156,6 +189,7 @@ def target_tick():
 
 
 def checking_the_destruction_of_targets():
+    '''Проверка попадания ядра в мишень'''
     global targets, cannonballs, root_copy, score, id_score
     if targets and cannonballs:
         i = 0
@@ -196,7 +230,8 @@ def button_released_handler(event):
     button_released = 1
 
 
-def new_game(event):
+def new_game_handler(event):
+    '''Создает новую игру по нажатию правой кнопки мыши'''
     global cannon, canvas, root_copy, red, cannonballs, targets, score, id_score
     if targets:
         for target in targets:
@@ -231,7 +266,7 @@ def main(root):
     canvas.bind('<Motion>', motion_of_mouse_handler)
     canvas.bind('<Button-1>', click_handler)
     canvas.bind('<ButtonRelease-1>', button_released_handler)
-    canvas.bind('<Button-3>', new_game)
+    canvas.bind('<Button-3>', new_game_handler)
     root.mainloop()
 
 
