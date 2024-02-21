@@ -1,1 +1,1 @@
-# 2019 MIPT: Python course
+# 2019 MIPT: Algorithms and Data Structures course on Python
